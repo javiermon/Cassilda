@@ -23,7 +23,7 @@ setup(
       long_description = open('README').read(),
       data_files = [
                     ("/usr/share/doc/Cassilda", 
-                            [ "README.txt", "LICENSE.txt"]),
+                            [ "README", "LICENSE"]),
                     ("/usr/share/doc/Cassilda/examples", 
                             ["examples/apache_install.cas",
                             "examples/apache_mysql.cas",
