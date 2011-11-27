@@ -1,5 +1,5 @@
 ========
-cassilda
+Cassilda
 ========
 -------------------------------------------------------------
 an UML/QEMU/XEN image generator, runner and testing framework
@@ -9,6 +9,9 @@ Installation and usage
 ----------------------
 Download
 ~~~~~~~~
+Get last version from github:.
+
+  git clone git://github.com/odkq/Cassilda.git
 
 Requirements
 ~~~~~~~~~~~~
