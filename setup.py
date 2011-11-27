@@ -18,7 +18,7 @@ setup(
       author = "Pablo Martin and Eduardo Aguilar",
       author_email = "pablo@odkq.com",
       packages = ['cassilda'],
-      url = "http://veriton/git?p=scripts.git;a=tree;f=cassilda",
+      url = "https://github.com/odkq/Cassilda",
       license = "GPL v3",
       long_description = open('README').read(),
       data_files = [
