@@ -31,6 +31,7 @@ setup(
                             "examples/mysql_install.cas",
                             "examples/webclient_install.cas",
                             "examples/yodawg.cas" ])
-      ]
+      ],
+      classifiers = classifiers
 )
 
