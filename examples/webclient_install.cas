@@ -1,0 +1,13 @@
+%YAML 1.1
+--- !installer
+name: webclient
+description: Web browser installer
+install: |
+  true
+uninstall: |
+  true
+run: |
+  true
+stop: |
+  true
+...

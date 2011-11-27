@@ -1,0 +1,53 @@
+%YAML 1.1
+--- !include
+include:
+  - cassilda_install.cas
+...
+
+--- !general
+description: Profile for Cassilda, installing Cassilda!
+repository: http://127.0.0.1:3142/ftp.fi.debian.org/debian
+kernel: http://uml.devloop.org.uk/kernels/kernel32-2.6.39.3.bz2
+...
+
+--- !image
+name: cassilda-guest
+size: 4000000000
+# 4G so it can have a 1G image inside
+memory: 128m
+networks: [ first ]
+builder: debian_squeeze
+# What do we need to install Cassilda in a Debian Squeeze?
+packages: >
+  python python-yaml python-netaddr python-pexpect \
+uml-utilities debootstrap apt-cacher-ng
+
+install: cassilda
+
+test:
+ - test1: |
+     echo 'Hello world'
+     echo 'inside test1'
+...
+
+--- !documentation
+kind: asciidoc
+markup : "
+Yo Dawg
+=======
+
+'I heard you like virtual images, so i put an virtual image inside your
+ virtual image so you can image while you image'
+
+A Profile for Cassilda.
+
+This profile describe 1 image that runs cassilda 
+\"inside cassilda\" and test things like double network
+discovery
+
+- What happens if the host IP address IS 192.168.0.X?
+- It is feasible to use Cassilda inside Cassilda-installed
+  XEN instances?
+- What happens with the escape character doing an interact()?
+"
+

@@ -1,0 +1,77 @@
+%YAML 1.1
+--- !include
+include:
+  - apache_install.cas
+  - mysql_install.cas
+  - webclient_install.cas
+...
+
+--- !general
+description: >
+  Profile for Cassilda, with three images, one with
+  mysql, the other with apache and a third with a web client
+repository: http://127.0.0.1:3142/ftp.fi.debian.org/debian
+kernel: http://uml.devloop.org.uk/kernels/kernel32-2.6.39.3.bz2
+...
+
+--- !image
+name: apache_server
+size: 1000000000
+memory: 128m
+networks: [ first, second ]
+builder: debian_squeeze
+packages: >
+  apache2 openssh-server
+
+install: apache
+
+test:
+ - test1: |
+     echo 'TODO'
+...
+
+--- !image
+name: mysql_server
+size: 1000000000
+memory: 128m
+networks: [ second ]
+builder: debian_squeeze
+packages: >
+  mysql-server openssh-server
+
+install: apache
+
+test:
+ - test1: |
+     echo 'TODO'
+...
+
+--- !image
+name: webclient_host
+size: 1000000000
+memory: 128m
+networks: [ first ]
+builder: debian_squeeze
+packages: >
+  lynx openssh-server
+
+install: webclient
+
+test:
+ - test1: |
+     echo 'TODO'
+...
+
+--- !documentation
+kind: asciidoc
+markup : "
+Apache, Mysql and web client
+============================
+
+Simple setup that serves as an example on how to use Cassilda
+
+This profile describe 3 images, one with a mysql server,
+another one with an apache server, and a third acting as a 
+client testing a simple php app in the server image
+"
+

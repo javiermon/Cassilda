@@ -1,0 +1,13 @@
+%YAML 1.1
+--- !installer
+name: apache
+description: Apache installer recipe
+install: |
+  true
+uninstall: |
+  true
+run: |
+  true
+stop: |
+  true
+...

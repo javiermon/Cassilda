@@ -1,0 +1,13 @@
+%YAML 1.1
+--- !installer
+name: mysql
+description: Mysql installer recipe
+install: |
+  true
+uninstall: |
+  true
+run: |
+  true
+stop: |
+  true
+...

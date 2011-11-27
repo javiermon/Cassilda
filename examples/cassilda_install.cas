@@ -1,0 +1,17 @@
+%YAML 1.1
+--- !installer
+name: cthulhu
+description: Cassilda installer recipe
+install: |
+  echo (cassilda tarball)
+
+uninstall: |
+  echo 'hello fruits'
+
+run: |
+  echo 'bartolo tenia una flauta'
+
+stop: |
+  echo 'con un agujero solo'
+
+...
