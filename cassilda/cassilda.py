@@ -191,9 +191,9 @@ class Cassilda:
 
     def __getitem__(self, image_name):
         """ Return the network object referenced by name """
-        for network in self.networks:
-            if network.name == image_name:
-                return network
+        for image in self.images:
+            if image.name == image_name:
+                return image
         return None
 
     def __get_kernel_file_name(self, kernel_url):
