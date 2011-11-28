@@ -3,7 +3,7 @@ __version__ = "cassilda 0.0.1"
 """
 Module defining the Cassilda class
 
-See README.txt for details
+See README for details
 """
 import yaml
 import os
@@ -160,27 +160,28 @@ class Cassilda:
         the cassilda configuration file"""
         if not os.geteuid() == 0:
             raise Exception("Only root can run this (yet)")
-        for i in self.images:
-            if i.name == name:
-                print("install_and_configure: Building image ", i.name)
-                # builder = Builder.build(i, self.repository)
-                builder = debian_squeeze_Builder() 
-                if builder == None:
-                    return False
-                b = builder.build(i, self.repository, i.size)
-                for n in self.networks.get_networks_by_host(name):
-                    h = n.get_host_by_name(name)
-                    a = n.get_addresses()
-                    print("Setting up host ", name, " with address "
-                        , h.address," into network ", a)
-                    builder.set_network(i.imagename, str(h.address),
-                            a['netmask'], a['network'], a['broadcast'],
-                            str(h.tapaddress), h.internaldevice)
-                    print("Setting up mac address of host device ",
-                            h.internaldevice, "with mac address ",
-                            h.macaddress)
-                    builder.set_mac_address(i.imagename, h.internaldevice,
-                            h.macaddress) 
+        i = self[name]
+        if i == None:
+            raise Exception('Image ' + name + ' is not in the profile')
+        print("install_and_configure: Building image ", i.name)
+        # builder = Builder.build(i, self.repository)
+        builder = debian_squeeze_Builder() 
+        if builder == None:
+            return False
+        b = builder.build(i, self.repository, i.size)
+        for n in self.networks.get_networks_by_host(name):
+            h = n.get_host_by_name(name)
+            a = n.get_addresses()
+            print("Setting up host ", name, " with address "
+                , h.address," into network ", a)
+            builder.set_network(i.imagename, str(h.address),
+                    a['netmask'], a['network'], a['broadcast'],
+                    str(h.tapaddress), h.internaldevice)
+            print("Setting up mac address of host device ",
+                    h.internaldevice, "with mac address ",
+                    h.macaddress)
+            builder.set_mac_address(i.imagename, h.internaldevice,
+                    h.macaddress) 
 
     def __get_installer_from_name(self, installer_name):
         for i in self.installers:
@@ -188,10 +189,11 @@ class Cassilda:
                 return i
         return None
 
-    def __get_image_from_name(self, image_name):
-        for i in self.images:
-            if i.name == image_name:
-                return i
+    def __getitem__(self, image_name):
+        """ Return the network object referenced by name """
+        for network in self.networks:
+            if network.name == image_name:
+                return network
         return None
 
     def __get_kernel_file_name(self, kernel_url):
@@ -238,7 +240,7 @@ class Cassilda:
         """ Setup firewall rules and call runner object to run the image """
         if not os.geteuid() == 0:
             raise Exception("Only root can run this (yet)")
-        image = self.__get_image_from_name(imagename)
+        image = self[imagename]
         if image == None:
             raise ValueError("No image with name " + imagename + " found")
 
@@ -264,11 +266,11 @@ class Cassilda:
         if not self.running(imagename):
             print 'Image is not running, nowhere to attach to'
         else:
-            image = self.__get_image_from_name(imagename)
+            image = self[imagename]
             image.runner.interact()
  
     def running(self, imagename):
-        image = self.__get_image_from_name(imagename)
+        image = self[imagename]
         return image.runner.running()
 
     def run_all(self):
