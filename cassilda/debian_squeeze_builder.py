@@ -37,6 +37,11 @@ class debian_squeeze_Builder(Builder):
         self.append_to_file("/etc/hostname", hostname, overwrite=True)
         self.umount_filesystem()
 
+    def set_repository(self, imagepath, address):
+        self.mount_filesystem(imagepath)
+        self.replace_in_file("/etc/apt/sources.list", "127.0.0.1", address)
+        self.umount_filesystem()
+
     def set_network(self, imagepath, address, netmask, network, broadcast,
                                                 gateway, internaldevice):
         """ Set network in debian putting its parameters in
@@ -57,7 +62,7 @@ class debian_squeeze_Builder(Builder):
         iz += "\tbroadcast " + broadcast + "\n"
         if gateway:
             iz += "\tgateway " + gateway + "\n"
-
+        
         self.append_to_file("/etc/network/interfaces", iz, overwrite)
         self.umount_filesystem()
 

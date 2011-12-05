@@ -85,11 +85,33 @@ class NetworksLoader(yaml.YAMLObject):
         self.networks = networks
 
 class Installer():
-    def __init__(self, name, description, install, uninstall, run, stop):
+    def __init__(self, image, name, description, install, uninstall, run, stop):
         args, _, _, values = inspect.getargvalues(inspect.currentframe())
         for i in args:
             self.__dict__[i] = values[i]
- 
+
+    def login(self):
+        if self.logged:
+            return True
+        self.image.sp.sendline('')
+        self.image.sp.expect('login: ')
+        self.image.sp.sendline('root')
+        self.image.sp.expect('Password: ')
+        self.image.sp.sendline('root')
+        self.image.sp.expect('# ')
+        self.logged = True
+
+    def logout(self):
+        if not self.logged:
+            return True
+        self.image.sp.sendline('')
+        self.image.sp.expect('# ')
+        self.image.sp.sendline('logout')
+        self.image.sp.expect('login: ')
+        self.logged = False
+
+    def halt(self):
+        self.login()
 
 class Cassilda:
     """
@@ -123,15 +145,13 @@ class Cassilda:
                 if il == None:
                     raise Exception('Specificed installer ' + n +
                         ' not found')
-                image_installer = self.process_installer(il)
+                image_installer = self.process_installer(i, il)
                 i.installers.append(image_installer)
 
-    def process_installer(self, il):
-        installer = Installer(il.name, il.description, 
-            self.process_code(il.install),
-            self.process_code(il.uninstall),
-            self.process_code(il.run),
-            self.process_code(il.stop))
+    def process_installer(self, image, il):
+        installer = Installer(image, il.name, il.description, 
+            self.process_code(il.install), self.process_code(il.uninstall),
+            self.process_code(il.run), self.process_code(il.stop))
         return installer
 
     # Return an array containing pexpect 'expect() and call()'
@@ -139,8 +159,9 @@ class Cassilda:
     def process_code(self, code):
         r = []
         t = {}
-        t['expect'] = None
+        t['expect-before'] = [ None, 0 ]
         t['call'] = code
+        t['expect-after'] =  [ None, 0 ]
         r.append(t)
         return r
 
@@ -184,14 +205,14 @@ class Cassilda:
                 self.networks.append(data)
             """
 
-    def install_and_configure_all(self):
+    def build_all(self):
         """ Install all images in the .cassilda """
         for i in self.images:
-            self.install_and_configure(i.name)
+            self.build(i.name)
 
-    def install_and_configure(self, name):
-        """ Install and configure the image referenced by name from
-        the cassilda configuration file"""
+    def build(self, name):
+        """ Build and configure networks/etc for the image referenced
+            by name from the cassilda configuration file"""
         if not os.geteuid() == 0:
             raise Exception("Only root can run this (yet)")
         i = self[name]
@@ -215,8 +236,20 @@ class Cassilda:
                     h.internaldevice, "with mac address ",
                     h.macaddress)
             builder.set_mac_address(i.imagename, h.internaldevice,
-                    h.macaddress) 
-    
+                    h.macaddress)
+        # Set sources.list with the ip of the first network
+        # found for the image
+        h = self.networks.get_networks_by_host(name)[0].get_host_by_name(name)
+        builder.set_repository(i.imagename, str(h.tapaddress))
+
+    def install(self, name):
+        i = self[name]
+        if i == None:
+            raise Exception('Image ' + name + ' is not in the profile')
+        self.run(name)
+        for ins in i.installers:
+            print('install: Installing ' + ins.name + ' into ' + i.name)
+
     def __get_installer_loader_from_name(self, installer_name):
         for i in self.installers:
             if i.name == installer_name:
