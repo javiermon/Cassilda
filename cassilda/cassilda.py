@@ -11,6 +11,7 @@ import time
 import tempfile
 import urllib
 import bz2
+import inspect
 
 from .image import Image
 from .builder import Builder
@@ -19,30 +20,21 @@ from .networks import Networks
 from .firewall import Firewall
 from .runner import *
 
-#
 # Convenient classes to handle YAML document types
-#
 class ImageLoader(yaml.YAMLObject):
     yaml_tag = u'!image'
     def __init__(self, name, size, memory, networks, builder, packages,
-            install, uninstall, test):
-        self.name = name
-        self.size = size
-        self.memory = memory
-        self.networks = networks
-        self.builder = builder
-        self.packages = packages
-        self.install = install
-        self.uninstall = uninstall
-        self.test = test
+            installer, test):
+        args, _, _, values = inspect.getargvalues(inspect.currentframe())
+        for i in args:
+            self.__dict__[i] = values[i]
 
 class GeneralLoader(yaml.YAMLObject):
     yaml_tag = u'!general'
     def __init__(self, description, repository, kernel, default_packages):
-        self.description = description
-        self.repository = repository
-        self.kernel = kernel
-        self.default_packages = default_packages
+        args, _, _, values = inspect.getargvalues(inspect.currentframe())
+        for i in args:
+            self.__dict__[i] = values[i]
 
 class DocumentationLoader(yaml.YAMLObject):
     yaml_tag = u'!documentation'
@@ -72,28 +64,33 @@ class IncludeLoader(yaml.YAMLObject):
             if not fullpath:
                 raise Exception("included file wasn't found in the" +
                         " includepaths: " + filename)
-            print('Including yaml from %s' % fullpath)
+            # print('Including yaml from %s' % fullpath)
             f = open(fullpath, 'r')
             s = f.read()
             f.close()
             for data in yaml.load_all(s):
                 cas.parse_yaml_doc(data, includepaths)
 
+# class Installer(name, description, install, uninstall, run, stop)
 class InstallerLoader(yaml.YAMLObject):
     yaml_tag = u'!installer'
     def __init__(self, name, description, install, uninstall, run, stop):
-        self.name = name
-        self.description = description
-        self.install = install
-        self.uninstall = uninstall
-        self.run = run
-        self.stop = stop 
+        args, _, _, values = inspect.getargvalues(inspect.currentframe())
+        for i in args:
+            self.__dict__[i] = values[i]
 
 class NetworksLoader(yaml.YAMLObject):
     yaml_tag = u'!networks'
     def __init__(self, networks):
         self.networks = networks
+
+class Installer():
+    def __init__(self, name, description, install, uninstall, run, stop):
+        args, _, _, values = inspect.getargvalues(inspect.currentframe())
+        for i in args:
+            self.__dict__[i] = values[i]
  
+
 class Cassilda:
     """
     Cassilda represents a group of images with it's settings
@@ -111,14 +108,49 @@ class Cassilda:
         f.close()
         for data in yaml.load_all(s):
             self.parse_yaml_doc(data, includepaths)
+        self.parse_installers()
         self.firewall = Firewall(self.networks)
         return None
 
+    def parse_installers(self):
+        for i in self.images:
+            if i.installer == None:
+                print('Note that image ' + i.name + 'dont have installers')
+                return
+            for n in i.installer:
+                # print('image ' + i.name + ' installer ' + n)
+                il = self.__get_installer_loader_from_name(n)
+                if il == None:
+                    raise Exception('Specificed installer ' + n +
+                        ' not found')
+                image_installer = self.process_installer(il)
+                i.installers.append(image_installer)
+
+    def process_installer(self, il):
+        installer = Installer(il.name, il.description, 
+            self.process_code(il.install),
+            self.process_code(il.uninstall),
+            self.process_code(il.run),
+            self.process_code(il.stop))
+        return installer
+
+    # Return an array containing pexpect 'expect() and call()'
+    # arguments
+    def process_code(self, code):
+        r = []
+        t = {}
+        t['expect'] = None
+        t['call'] = code
+        r.append(t)
+        return r
+
     def parse_yaml_doc(self, data, includepaths):
             if data.__class__ == ImageLoader:
-                print("ImageLoader: %s" % data.name)
+                # print("ImageLoader: %s" % data.name)
+                dir(data)
                 im = Image(data.name, data.size, data.memory,
-                                data.builder, data.packages)
+                                data.builder, data.packages,
+                                data.installer)
                 # Set networks
                 devn = 0
                 try:
@@ -135,7 +167,7 @@ class Cassilda:
                     raise
                 self.images.append(im)
             elif data.__class__ == GeneralLoader:
-                print("GeneralLoader.repository: %s" % data.repository)
+                # print("GeneralLoader.repository: %s" % data.repository)
                 self.kernelurl = data.kernel 
                 self.repository = data.repository
             elif data.__class__ == DocumentationLoader:
@@ -143,12 +175,14 @@ class Cassilda:
             elif data.__class__ == IncludeLoader:
                 data.load_docs(self, includepaths)
             elif data.__class__ == InstallerLoader:
-                print("InstallerLoader.name: %s description %s" % (data.name,
-                                data.description))
+                # print("InstallerLoader.name: %s description %s" % (data.name,
+                #                data.description))
                 self.installers.append(data)
+            """
             elif data.__class__ == NetworksLoader:
                 print("InstallerLoader.networks %s" % data.networks)
-                self.installers.append(data)
+                self.networks.append(data)
+            """
 
     def install_and_configure_all(self):
         """ Install all images in the .cassilda """
@@ -182,8 +216,8 @@ class Cassilda:
                     h.macaddress)
             builder.set_mac_address(i.imagename, h.internaldevice,
                     h.macaddress) 
-
-    def __get_installer_from_name(self, installer_name):
+    
+    def __get_installer_loader_from_name(self, installer_name):
         for i in self.installers:
             if i.name == installer_name:
                 return i

@@ -205,10 +205,10 @@ class Networks:
         oldnet = self.currnet
         self.currnet = netaddr.IPNetwork(str(self.next_address) + '/24')
         if self.conflicting_network(self.currnet):
-            print 'There is a conflict between our current'
-            print 'default gw and the one asked'
-            print 'for the guest. never mind,'
-            print 'we just skip to the next avaliable network :)'
+#            There is a conflict between our current'
+#            default gw and the one asked'
+#            for the guest. never mind,'
+#            we just skip to the next avaliable network :)'
             self.next_address += 256
             self.currnet = netaddr.IPNetwork(str(self.next_address) + '/24')
         self.next_address += 256

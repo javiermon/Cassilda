@@ -9,7 +9,7 @@ from .runner import *
 
 class Image:
     """Represents an installing or running Image"""
-    def __init__(self, name, size, memory, distribution, packages):
+    def __init__(self, name, size, memory, distribution, packages, installer):
         self.name = name
         self.size = size
         self.memory = memory
@@ -18,6 +18,8 @@ class Image:
         self.basename = self.distribution + ".img"
         self.imagename = self.distribution + "-" + self.name + ".img"
         self.runner = None
+        self.installer = installer
+        self.installers = []
 
     def already_installed(self):
         return os.path.exists(self.imagename)

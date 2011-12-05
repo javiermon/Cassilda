@@ -33,7 +33,7 @@ test:
 --- !image
 name: mysql_server
 size: 1000000000
-memory: 128m
+memory: 256m
 networks: [ second ]
 builder: debian_squeeze
 packages: >

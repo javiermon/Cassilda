@@ -86,6 +86,10 @@ Installers
 ~~~~~~~~~~
 To be written yet
 
+Testing with pexpect
+~~~~~~~~~~~~~~~~~~~~
+To be written yet
+
 Extending Cassilda
 ------------------
 Writing builders
@@ -95,4 +99,7 @@ To be written yet
 Writing runners
 ~~~~~~~~~~~~~~~
 To be written yet
+
+Writing interfaces
+~~~~~~~~~~~~~~~~~~
 

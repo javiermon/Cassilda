@@ -57,10 +57,6 @@ class Builder:
         the install_image of the builder '''
         if not os.path.exists(basename):
             return self.install_image(packages, imagename, repository)
-            # Copy the image to the basename 
-            # self.log("Copying " + imagename + " to " + basename +
-            #                                   " after first install") 
-            # self.call(["cp", "--sparse=always", imagename, basename])
         else:
             self.log("Copying " + basename + " to " + imagename +
                                             " (not first install)") 

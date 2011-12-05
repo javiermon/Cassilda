@@ -3,11 +3,14 @@
 name: apache
 description: Apache installer recipe
 install: |
+  root$:
+  
   true
 uninstall: |
   true
 run: |
+  invoke-rc.d apache2 start
   true
 stop: |
-  true
+  invoke-rc.d apache2 stop
 ...

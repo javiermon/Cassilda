@@ -37,13 +37,6 @@ class Runner:
         self.log_callback(line)
 
     def run(self, termnum):
-        d, m = divmod(termnum, 2)
-        if m:
-            x = 486
-        else:
-            x = 0
-        y = d * 256
-
         commandline = "./" + self.kernelpath + " " + "ubd0="
         commandline += self.imagepath + " mem=" + self.memory + " "
 
@@ -63,7 +56,11 @@ class Runner:
     def interact(self):
         self.sp.interact()
 
+    def call(self, commands):
+        pass
+ 
     def shutdown(self):
         """ Log as root in the image and perform a shutdown -h now """
+        pass
  
 
