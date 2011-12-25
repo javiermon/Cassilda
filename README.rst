@@ -60,14 +60,13 @@ Example session::
     >>> import cassilda
     ## Load settings from a YAML cassilda profile
     >>> c = cassilda.Cassilda(
-	"/usr/share/doc/Cassilda/examples/apache_mysql.cas",
-	['/usr/share/doc/Cassilda/examples/'])
+	"/usr/share/doc/Cassilda/examples/apache_mysql.cas")
     ## Install an image
-    >>> c.install_and_configure("apache_server")
+    >>> c.build("apache_server")
     (output from cassilda)
     ## Install all images
-    >>> c.install_and_configure("mysql_server")
-    >>> c.install_and_configure("web_client")
+    >>> c.build("mysql_server")
+    >>> c.build("web_client")
     ## Run an image
     >>> c.run("apache_server")
     ## Interact (with the console) of a running image

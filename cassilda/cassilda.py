@@ -118,7 +118,7 @@ class Cassilda:
     Cassilda represents a group of images with it's settings
     and eventually some tests
     """
-    def __init__(self, path, includepaths):
+    def __init__(self, path, includepaths = []):
         """ Cassilda constructor. Path must point to a valid 
         cassilda configuration file in YAML format"""
         self.d = None;
@@ -128,6 +128,7 @@ class Cassilda:
         f = open(path, 'r')
         s = f.read()
         f.close()
+        includepaths.append(os.path.dirname(path) + '/')
         for data in yaml.load_all(s):
             self.parse_yaml_doc(data, includepaths)
         self.parse_installers()
