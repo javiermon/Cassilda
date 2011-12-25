@@ -20,7 +20,7 @@ setup(
       packages = ['cassilda'],
       url = "https://github.com/odkq/Cassilda",
       license = "GPL v3",
-      long_description = open('README').read(),
+      long_description = open('README.rst').read(),
       data_files = [
                     ("/usr/share/doc/Cassilda", 
                             [ "README.rst", "LICENSE"]),
