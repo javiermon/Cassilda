@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+import cassilda
+from sys import argv
+
+c = cassilda.Cassilda(argv[1])
+c.run(argv[2])
+c.interact(argv[2])
+c.finish(argv[2])
