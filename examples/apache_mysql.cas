@@ -23,7 +23,7 @@ builder: debian_squeeze
 packages: >
   apache2 openssh-server
 
-install: apache
+install: [ apache ]
 
 test:
  - test1: |
@@ -39,7 +39,7 @@ builder: debian_squeeze
 packages: >
   mysql-server openssh-server
 
-install: apache
+install: [ mysql ]
 
 test:
  - test1: |
@@ -55,7 +55,7 @@ builder: debian_squeeze
 packages: >
   lynx openssh-server
 
-install: webclient
+install: [ webclient ]
 
 test:
  - test1: |

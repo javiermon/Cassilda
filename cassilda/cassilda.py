@@ -89,6 +89,12 @@ class Installer():
         args, _, _, values = inspect.getargvalues(inspect.currentframe())
         for i in args:
             self.__dict__[i] = values[i]
+        print ('Installer.name ' + name)
+        print ('Installer.description ' + description)
+        print ('Installer.install ' + str(install))
+        print ('Installer.uninstall ' + str(uninstall))
+        print ('Installer.run ' + str(run))
+        print ('Installer.stop ' + str(stop))
 
     def login(self):
         if self.logged:
@@ -125,6 +131,7 @@ class Cassilda:
         self.networks = Networks()
         self.images = []
         self.installers = []
+        self.installer = []
         f = open(path, 'r')
         s = f.read()
         f.close()
@@ -137,15 +144,17 @@ class Cassilda:
 
     def parse_installers(self):
         for i in self.images:
-            if i.installer == None:
+            if i.install == None:
                 print('Note that image ' + i.name + 'dont have installers')
                 return
-            for n in i.installer:
+            for n in i.install:
                 # print('image ' + i.name + ' installer ' + n)
                 il = self.__get_installer_loader_from_name(n)
                 if il == None:
                     raise Exception('Specificed installer ' + n +
                         ' not found')
+                print ('Loading installer in image ' + i.name + 
+                    ' for ' + n)
                 image_installer = self.process_installer(i, il)
                 i.installers.append(image_installer)
 
@@ -172,7 +181,7 @@ class Cassilda:
                 dir(data)
                 im = Image(data.name, data.size, data.memory,
                                 data.builder, data.packages,
-                                data.installer)
+                                data.install)
                 # Set networks
                 devn = 0
                 try:
@@ -225,6 +234,8 @@ class Cassilda:
         if builder == None:
             return False
         b = builder.build(i, self.repository, i.size)
+        if b == None:
+            return False
         for n in self.networks.get_networks_by_host(name):
             h = n.get_host_by_name(name)
             a = n.get_addresses()
